@@ -1,11 +1,26 @@
 import mongoose from "mongoose"
-import Category from "./category.js"
 
 const ProductSchema = mongoose.Schema({
     name: {
-        type: String
-    }
+        type: String,
+        equired: true
+    },
+    description: {
+        type: String,
+        required: true
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'category',
+        required: true
+    },
+    images: {
+        type: Array,
+        default: []
+    },
 },
 {
     versionKey: false
 })
+
+export default mongoose.model("product", ProductSchema)
