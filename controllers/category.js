@@ -1,4 +1,3 @@
-import Category from "../models/category.js";
 import { meta } from "../utils/enum.js";
 import { findAll, upsertById } from "../utils/funcs.js";
 
@@ -22,7 +21,7 @@ export async function listCategory(req, res) {
 
 export async function upsertCategory(req, res) {
     try {
-        upsertById(category_t, req.body._id, category, defaultCallback(res))
+        upsertById(category_t, req.body._id, req.body, defaultCallback(res))
     } catch (error) {
         res.status(500).json({ meta: meta.ERROR, message: error.message })
     }
