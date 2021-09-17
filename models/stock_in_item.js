@@ -1,23 +1,29 @@
 import mongoose from "mongoose"
+import { stockInTypes } from "../utils/enum.js"
 
 const StockInItemSchema = mongoose.Schema({
-    stockIn: {
+    stock_in: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stock_in',
         required: true
     },
-    stockInfo: {
+    stock_info: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stock_info',
         required: true
+    },
+    cost: { //if stock in via purchase
+        type: Number,
+        min: 0,
+        required: () => this.stock_in.type == stockInTypes.purchase,
     },
     quantity: {
         type: Number,
         required: true
     }
 },
-{
-    versionKey: false
-})
+    {
+        versionKey: false
+    })
 
 export default mongoose.model("stock_in_item", StockInItemSchema)

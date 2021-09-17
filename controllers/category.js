@@ -1,15 +1,7 @@
 import { meta } from "../utils/enum.js";
-import { findAll, upsertById } from "../utils/funcs.js";
+import { findAll, upsertById, findById, findByIdAndDelete, defaultCallback } from "../utils/funcs.js";
 
 const category_t = 'category'
-
-const defaultCallback = res => (err, doc) => {
-    if (err) {
-        res.status(400).json({ meta: meta.ERROR, message: err.message });
-        return;
-    }
-    res.status(200).json({ meta: meta.OK, data: doc });
-}
 
 export async function listCategory(req, res) {
     try {
@@ -22,6 +14,22 @@ export async function listCategory(req, res) {
 export async function upsertCategory(req, res) {
     try {
         upsertById(category_t, req.body._id, req.body, defaultCallback(res))
+    } catch (error) {
+        res.status(500).json({ meta: meta.ERROR, message: error.message })
+    }
+}
+
+export async function getCategoryById(req, res) {
+    try {
+        findById(category_t, req.params.id, defaultCallback(res))
+    } catch (error) {
+        res.status(500).json({ meta: meta.ERROR, message: error.message })
+    }
+}
+
+export async function deleteCategoryById(req, res) {
+    try {
+        findByIdAndDelete(category_t, req.params.id, defaultCallback(res))
     } catch (error) {
         res.status(500).json({ meta: meta.ERROR, message: error.message })
     }

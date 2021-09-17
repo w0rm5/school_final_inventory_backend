@@ -1,13 +1,12 @@
 import mongoose from "mongoose"
 
-const StockInSchema = mongoose.Schema({
+const StockOutSchema = mongoose.Schema({
     type: {
         type: Number,
         required: true
     },
-    attachments: {
-        type: Array,
-        default: []
+    ref: {
+        type: mongoose.Types.ObjectId
     },
     remarks: {
         type: String,
@@ -18,4 +17,4 @@ const StockInSchema = mongoose.Schema({
     versionKey: false
 })
 
-export default mongoose.model("stock_in", StockInSchema)
+export default mongoose.model("stock_out", StockOutSchema)

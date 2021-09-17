@@ -6,11 +6,11 @@ const StockInfoSchema = mongoose.Schema({
         ref: 'product',
         required: true
     },
-    stockInHistory: {
+    stock_in_history: {
         type: Array,
         default: []
     },
-    currentQuantity: {
+    current_quantity: {
         type: Number,
         default: 0
     }
