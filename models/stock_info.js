@@ -6,7 +6,7 @@ const StockInfoSchema = mongoose.Schema({
         ref: 'product',
         required: true
     },
-    stock_in_history: {
+    cost_history: { //from stock in
         type: Array,
         default: []
     },

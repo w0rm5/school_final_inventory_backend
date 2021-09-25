@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { meta } from './enum.js'
 
 import category from '../models/category.js'
 import product from '../models/product.js'
@@ -36,7 +37,7 @@ export function findByIdAndDelete(table, id, callback) {
     tables[table].findByIdAndDelete(id, callback)
 }
 
-export function find(table, filter, callback){
+export function find(table, filter, callback) {
     tables[table].find(filter, callback)
 }
 
