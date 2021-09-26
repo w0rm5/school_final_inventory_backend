@@ -29,6 +29,15 @@ export const defaultCallback = res => (err, doc) => {
     res.status(200).json({ meta: meta.OK, data: doc });
 }
 
+export const populateCallback = (res, table, path) => async (err, doc) => {
+    if (err) {
+        res.status(400).json({ meta: meta.ERROR, message: err.message });
+        return;
+    }
+    await tables[table].populate(doc, path)
+    res.status(200).json({ meta: meta.OK, data: doc });
+}
+
 export function findById(table, id, callback) {
     tables[table].findById(id, callback)
 }
