@@ -26,12 +26,21 @@ export const defaultCallback = res => (err, doc) => {
         res.status(400).json({ meta: meta.ERROR, message: err.message });
         return;
     }
+    if(!doc || !doc.length){
+        res.status(404).json({ meta: meta.ERROR, message: "Not found" });
+        return;
+    }
     res.status(200).json({ meta: meta.OK, data: doc });
 }
 
 export const populateCallback = (res, table, path) => async (err, doc) => {
     if (err) {
         res.status(400).json({ meta: meta.ERROR, message: err.message });
+        return;
+    }
+    console.log(doc);
+    if(!doc /*|| (Array.isArray(doc) && !doc.length)*/){
+        res.status(404).json({ meta: meta.ERROR, message: "Not found" });
         return;
     }
     await tables[table].populate(doc, path)
