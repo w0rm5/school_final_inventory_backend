@@ -21,28 +21,18 @@ const tables = {
     stock_out_item,
 }
 
-export const defaultCallback = res => (err, doc) => {
+export const defaultCallback = (res, table, path) => async (err, doc) => {
     if (err) {
         res.status(400).json({ meta: meta.ERROR, message: err.message });
         return;
     }
-    if(!doc /*|| (Array.isArray(doc) && !doc.length)*/){
-        res.status(404).json({ meta: meta.ERROR, message: "Not found" });
+    if (!doc /*|| (Array.isArray(doc) && !doc.length)*/) {
+        res.status(404).json({ meta: meta.NOTFOUND, message: "Not found" });
         return;
     }
-    res.status(200).json({ meta: meta.OK, data: doc });
-}
-
-export const populateCallback = (res, table, path) => async (err, doc) => {
-    if (err) {
-        res.status(400).json({ meta: meta.ERROR, message: err.message });
-        return;
+    if (path) {
+        await tables[table].populate(doc, path)
     }
-    if(!doc /*|| (Array.isArray(doc) && !doc.length)*/){
-        res.status(404).json({ meta: meta.ERROR, message: "Not found" });
-        return;
-    }
-    await tables[table].populate(doc, path)
     res.status(200).json({ meta: meta.OK, data: doc });
 }
 

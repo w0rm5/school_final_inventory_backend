@@ -1,10 +1,6 @@
 import mongoose from "mongoose"
 
 const StockOutSchema = mongoose.Schema({
-    type: {
-        type: Number,
-        required: true
-    },
     ref: {
         type: mongoose.Types.ObjectId
     },

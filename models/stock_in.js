@@ -1,10 +1,6 @@
 import mongoose from "mongoose"
 
 const StockInSchema = mongoose.Schema({
-    type: {
-        type: Number,
-        required: true
-    },
     attachments: {
         type: Array,
         default: []

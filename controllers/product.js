@@ -1,11 +1,11 @@
 import { meta } from "../utils/enum.js";
-import { findAll, upsertById, findById, findByIdAndDelete, defaultCallback, populateCallback } from "../utils/funcs.js";
+import { findAll, upsertById, findById, findByIdAndDelete, defaultCallback } from "../utils/funcs.js";
 
 const table_name = 'product'
 
 export async function listProduct(req, res) {
     try {
-        findAll(table_name, populateCallback(res, table_name, 'category'))
+        findAll(table_name, defaultCallback(res, table_name, 'category'))
     } catch (error) {
         res.status(500).json({ meta: meta.ERROR, message: error.message })
     }
@@ -13,7 +13,7 @@ export async function listProduct(req, res) {
 
 export async function upsertProduct(req, res) {
     try {
-        upsertById(table_name, req.body._id, req.body, populateCallback(res, table_name, 'category'))
+        upsertById(table_name, req.body._id, req.body, defaultCallback(res, table_name, 'category'))
     } catch (error) {
         res.status(500).json({ meta: meta.ERROR, message: error.message })
     }
@@ -21,7 +21,7 @@ export async function upsertProduct(req, res) {
 
 export async function getProductById(req, res) {
     try {
-        findById(table_name, req.params.id, populateCallback(res, table_name, 'category'))
+        findById(table_name, req.params.id, defaultCallback(res, table_name, 'category'))
     } catch (error) {
         res.status(500).json({ meta: meta.ERROR, message: error.message })
     }
