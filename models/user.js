@@ -1,6 +1,6 @@
 import mongoose from "mongoose"
 
-const ProductSchema = mongoose.Schema({
+const UserSchema = mongoose.Schema({
     first_name: {
         type: String,
         required: true
@@ -11,7 +11,6 @@ const ProductSchema = mongoose.Schema({
     },
     sex: {
         type: Number,
-
     },
     date_of_birth: {
         type: Date,
@@ -34,4 +33,4 @@ const ProductSchema = mongoose.Schema({
     versionKey: false
 })
 
-export default mongoose.model("product", ProductSchema)
+export default mongoose.model("user", UserSchema)
