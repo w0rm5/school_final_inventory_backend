@@ -9,6 +9,7 @@ import stock_in_item from '../models/stock_in_item.js'
 import stock_in from '../models/stock_in.js'
 import stock_out_item from '../models/stock_out_item.js'
 import stock_out from '../models/stock_out.js'
+import user from '../models/user.js'
 
 const tables = {
     category,
@@ -19,21 +20,22 @@ const tables = {
     stock_in_item,
     stock_out,
     stock_out_item,
+    user,
 }
 
 export const defaultCallback = (res, table, path) => async (err, doc) => {
     if (err) {
-        res.status(400).json({ meta: meta.ERROR, message: err.message });
+        res.status(meta.ERROR).json({ meta: meta.ERROR, message: err.message });
         return;
     }
     if (!doc /*|| (Array.isArray(doc) && !doc.length)*/) {
-        res.status(404).json({ meta: meta.NOTFOUND, message: "Not found" });
+        res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
         return;
     }
     if (path) {
         await tables[table].populate(doc, path)
     }
-    res.status(200).json({ meta: meta.OK, data: doc });
+    res.status(meta.OK).json({ meta: meta.OK, data: doc });
 }
 
 export function findById(table, id, callback) {

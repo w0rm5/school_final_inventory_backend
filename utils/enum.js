@@ -1,7 +1,8 @@
 export const meta = {
-    OK: 2000,
-    ERROR: 4000,
-    NOTFOUND: 4004,
+    OK: 200,
+    ERROR: 400,
+    NOT_FOUND: 404,
+    INTERNAL_ERROR: 500
 }
 
 export const stockInTypes = {

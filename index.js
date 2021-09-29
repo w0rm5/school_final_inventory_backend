@@ -1,12 +1,13 @@
 import express from "express";
 import mongoose from "mongoose"
+import "dotenv/config";
 
 import category from "./routers/category.js";
 import product from "./routers/product.js";
 
 const app = express();
 const port = process.env.PORT || 3000;
-const dbConString = 'mongodb+srv://kimpiv:ivtr.mongo@cluster0.jt8vy.mongodb.net/inventoryControl?retryWrites=true&w=majority';
+const dbConString = process.env.DB;
 
 // const options = { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true, autoIndex: true, }
 
