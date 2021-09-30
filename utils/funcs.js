@@ -50,6 +50,10 @@ export function find(table, filter, callback) {
     tables[table].find(filter, callback)
 }
 
+export function findOne(table, filter, callback) {
+    tables[table].findOne(filter, callback)
+}
+
 export function findAll(table, callback) {
     find(table, {}, callback)
 }

@@ -19,7 +19,7 @@ const StockInItemSchema = mongoose.Schema({
     cost: { //if stock in via purchase
         type: Number,
         min: 0,
-        required: () => this.type == stockInTypes.purchase,
+        required: () => this.type == stockInTypes.PURCHASE,
     },
     quantity: {
         type: Number,
