@@ -9,6 +9,10 @@ const UserSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    user_id: {
+        type: String,
+        required: true
+    },
     sex: {
         type: Number,
         required: true
@@ -29,6 +33,14 @@ const UserSchema = mongoose.Schema({
     profile_pic: {
         type: String
     },
+    is_admin: {
+        type: Boolean,
+        default: false
+    },
+    deactivated: {
+        type: Boolean,
+        default: false
+    }
 },
 {
     versionKey: false

@@ -7,7 +7,11 @@ const StockOutSchema = mongoose.Schema({
     remarks: {
         type: String,
         default: ''
-    }
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
 },
 {
     versionKey: false

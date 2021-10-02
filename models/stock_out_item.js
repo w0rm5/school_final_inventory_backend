@@ -1,8 +1,13 @@
 import mongoose from "mongoose"
+import { stockOutTypes } from "../utils/enum.js"
 
 const StockOutItemSchema = mongoose.Schema({
     type: {
         type: Number,
+        required: true
+    },
+    date: {
+        type: Date,
         required: true
     },
     stock_out: {
@@ -10,10 +15,15 @@ const StockOutItemSchema = mongoose.Schema({
         ref: 'stock_out',
         required: true
     },
-    stock_info: {
+    product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'stock_info',
+        ref: 'product',
         required: true
+    },
+    sale_price: { // per unit
+        type: Number,
+        min: 0,
+        required: () => this.type == stockOutTypes.SALE
     },
     quantity: {
         type: Number,

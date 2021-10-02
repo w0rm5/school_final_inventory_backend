@@ -19,6 +19,22 @@ const ProductSchema = mongoose.Schema({
         type: Array,
         default: []
     },
+    discontinued: {
+        type: Boolean,
+        default: false
+    },
+    cost_history: { //from stock in
+        type: Array,
+        default: []
+    },
+    sale_price_history: {
+        type: Array,
+        default: []
+    },
+    current_quantity: {
+        type: Number,
+        default: 0
+    }
 },
 {
     versionKey: false

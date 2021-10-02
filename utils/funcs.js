@@ -4,7 +4,6 @@ import { meta } from './enum.js'
 import category from '../models/category.js'
 import product from '../models/product.js'
 import supplier from '../models/supplier.js'
-import stock_info from '../models/stock_info.js'
 import stock_in_item from '../models/stock_in_item.js'
 import stock_in from '../models/stock_in.js'
 import stock_out_item from '../models/stock_out_item.js'
@@ -15,7 +14,6 @@ const tables = {
     category,
     product,
     supplier,
-    stock_info,
     stock_in,
     stock_in_item,
     stock_out,
@@ -25,7 +23,7 @@ const tables = {
 
 export const defaultCallback = (res, table, path) => async (err, doc) => {
     if (err) {
-        res.status(meta.ERROR).json({ meta: meta.ERROR, message: err.message });
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
         return;
     }
     if (!doc /*|| (Array.isArray(doc) && !doc.length)*/) {
@@ -46,8 +44,8 @@ export function findByIdAndDelete(table, id, callback) {
     tables[table].findByIdAndDelete(id, callback)
 }
 
-export function find(table, filter, callback) {
-    tables[table].find(filter, callback)
+export function find(table, filter, projection, option, callback) {
+    tables[table].find(filter, projection, option, callback)
 }
 
 export function findOne(table, filter, callback) {
@@ -55,7 +53,15 @@ export function findOne(table, filter, callback) {
 }
 
 export function findAll(table, callback) {
-    find(table, {}, callback)
+    tables[table].find(callback)
+}
+
+export function insert(table, doc, callback){
+    tables[table].create(doc, callback)
+}
+
+export function deleteById(table, id, callback) {
+    tables[table].deleteOne({ _id: id}, callback)
 }
 
 export function upsertById(table, id, update, callback) {

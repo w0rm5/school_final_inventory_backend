@@ -1,6 +1,11 @@
 import mongoose from "mongoose"
 
 const StockInSchema = mongoose.Schema({
+    supplier: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'supplier',
+        required: true
+    },
     attachments: {
         type: Array,
         default: []
@@ -8,7 +13,11 @@ const StockInSchema = mongoose.Schema({
     remarks: {
         type: String,
         default: ''
-    }
+    },
+    date: {
+        type: Date,
+        default: Date.now
+    },
 },
 {
     versionKey: false

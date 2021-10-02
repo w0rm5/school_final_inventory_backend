@@ -6,17 +6,21 @@ const StockInItemSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    date: {
+        type: Date,
+        required: true
+    },
     stock_in: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stock_in',
         required: true
     },
-    stock_info: {
+    product: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'stock_info',
+        ref: 'product',
         required: true
     },
-    cost: { //if stock in via purchase
+    cost: { // per unit
         type: Number,
         min: 0,
         required: () => this.type == stockInTypes.PURCHASE,

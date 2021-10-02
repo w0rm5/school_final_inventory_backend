@@ -2,10 +2,12 @@ import express from "express";
 import mongoose from "mongoose"
 import "dotenv/config";
 
+import { login } from "./controllers/user.js";
+import { verifyToken, checkIfAdmin } from "./middlewares/auth.js";
+import { logRequests } from "./middlewares/logs.js";
 import category from "./routers/category.js";
 import product from "./routers/product.js";
 import user from "./routers/user.js";
-import { login } from "./controllers/user.js";
 
 const app = express();
 const port = process.env.PORT || process.env.API_PORT;
@@ -21,14 +23,14 @@ mongoose.connect(dbConString, (err) => {
 
     app.use(express.json());
 
-    app.get('/', (req, res) => {
-        res.status(200).json({ message: 'Hello' })
-    })
+    // app.get('/', verifyToken, checkIfAdmin, (req, res) => { //testing
+    //     res.status(200).json({ message: 'Hello world' })
+    // })
 
-    app.post("/login", login)
-    app.use("/user", user)
-    app.use("/category", category)
-    app.use("/product", product)
+    app.post("/login", logRequests, login)
+    app.use("/user", verifyToken, logRequests, user)
+    app.use("/category", verifyToken, checkIfAdmin, category)
+    app.use("/product", verifyToken, product)
     app.listen(port, () => {
         console.log(`app listening at http://localhost:${port}`);
     })
