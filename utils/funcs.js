@@ -31,39 +31,43 @@ export const defaultCallback = (res, table, path) => async (err, doc) => {
         return;
     }
     if (path) {
-        await tables[table].populate(doc, path)
+        await populate(table, doc, path)
     }
     res.status(meta.OK).json({ meta: meta.OK, data: doc });
 }
 
+export async function populate(table, doc, path) {
+    await tables[table].populate(doc, path)
+}
+
 export function findById(table, id, callback) {
-    tables[table].findById(id, callback)
+    return tables[table].findById(id, callback)
 }
 
 export function findByIdAndDelete(table, id, callback) {
-    tables[table].findByIdAndDelete(id, callback)
+    return tables[table].findByIdAndDelete(id, callback)
 }
 
 export function find(table, filter, projection, option, callback) {
-    tables[table].find(filter, projection, option, callback)
+    return tables[table].find(filter, projection, option, callback)
 }
 
 export function findOne(table, filter, callback) {
-    tables[table].findOne(filter, callback)
+    return tables[table].findOne(filter, callback)
 }
 
 export function findAll(table, callback) {
-    tables[table].find(callback)
+    return tables[table].find(callback)
 }
 
 export function insert(table, doc, callback){
-    tables[table].create(doc, callback)
+    return tables[table].create(doc, callback)
 }
 
 export function deleteById(table, id, callback) {
-    tables[table].deleteOne({ _id: id}, callback)
+    return tables[table].deleteOne({ _id: id}, callback)
 }
 
 export function upsertById(table, id, update, callback) {
-    tables[table].findOneAndUpdate({ _id: id || new mongoose.Types.ObjectId() }, update, { upsert: true, new: true }, callback)
+    return tables[table].findOneAndUpdate({ _id: id || new mongoose.Types.ObjectId() }, update, { upsert: true, new: true }, callback)
 }

@@ -6,8 +6,10 @@ import { login } from "./controllers/user.js";
 import { verifyToken, checkIfAdmin } from "./middlewares/auth.js";
 import { logRequests } from "./middlewares/logs.js";
 import category from "./routers/category.js";
+import supplier from "./routers/supplier.js";
 import product from "./routers/product.js";
 import user from "./routers/user.js";
+import stock_in from "./routers/stock_in.js";
 
 const app = express();
 const port = process.env.PORT || process.env.API_PORT;
@@ -29,8 +31,10 @@ mongoose.connect(dbConString, (err) => {
 
     app.post("/login", logRequests, login)
     app.use("/user", verifyToken, logRequests, user)
-    app.use("/category", verifyToken, checkIfAdmin, category)
-    app.use("/product", verifyToken, product)
+    app.use("/category", verifyToken, logRequests, checkIfAdmin, category)
+    app.use("/supplier", verifyToken, logRequests, checkIfAdmin, supplier)
+    app.use("/product", verifyToken, logRequests, product)
+    app.use("/stock_in", verifyToken, logRequests, stock_in)
     app.listen(port, () => {
         console.log(`app listening at http://localhost:${port}`);
     })

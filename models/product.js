@@ -30,15 +30,31 @@ const ProductSchema = mongoose.Schema({
     },
     cost_history: { //from stock in
         type: Array,
-        default: []
+        default: [
+            /*{
+                stock_in: ObjectId,
+                cost: Number
+                remaining_qty: Number
+            }*/
+        ]
     },
     sale_price_history: {
         type: Array,
-        default: []
+        default: [
+            /*{
+                change_date: Date,
+                old_price: Number
+            }*/
+        ]
     },
     current_quantity: {
         type: Number,
         default: 0
+    },
+    current_sale_price: {
+        type: Number,
+        min: 0,
+        required: true
     }
 },
 {

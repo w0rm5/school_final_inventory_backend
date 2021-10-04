@@ -4,8 +4,6 @@ const RequestLogSchema = new mongoose.Schema({
     url: String,
     method: String,
     headers: Object,
-    params: Object,
-    query: Object,
     body: Object,
     userInfo: Object
 },

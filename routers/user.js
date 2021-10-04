@@ -2,7 +2,7 @@ import express from "express";
 import { registerUser, updateUser, resetPassword, forceResetPassword, listUser } from "../controllers/user.js";
 import { checkIfAdmin } from "../middlewares/auth.js";
 
-const router = express.Router()
+const router = express.Router({ mergeParams: true })
 
 router.post("/", checkIfAdmin, listUser)
 router.post("/register", checkIfAdmin, registerUser)
