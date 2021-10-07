@@ -23,7 +23,9 @@ const StockInItemSchema = mongoose.Schema({
     cost: { // per unit
         type: Number,
         min: 0,
-        required: () => this.type == stockInTypes.PURCHASE,
+        required: function() {
+            return this.type == stockInTypes.PURCHASE
+        },
     },
     quantity: {
         type: Number,

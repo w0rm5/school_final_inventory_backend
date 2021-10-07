@@ -32,7 +32,7 @@ const ProductSchema = mongoose.Schema({
         type: Array,
         default: [
             /*{
-                stock_in: ObjectId,
+                stock_in_item: ObjectId,
                 cost: Number
                 remaining_qty: Number
             }*/

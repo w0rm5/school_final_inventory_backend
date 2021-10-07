@@ -9,7 +9,9 @@ const StockInSchema = mongoose.Schema({
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'supplier',
-        required: () => this.type == stockInTypes.PURCHASE,
+        required: function() {
+            return this.type == stockInTypes.PURCHASE;
+        },
     },
     attachments: {
         type: Array,
