@@ -27,6 +27,13 @@ const StockOutItemSchema = mongoose.Schema({
             return this.type == stockOutTypes.SALE
         }
     },
+    cost: { // per unit
+        type: Number,
+        min: 0,
+        required: function() { 
+            return this.type == stockOutTypes.SALE
+        }
+    },
     quantity: {
         type: Number,
         required: true
