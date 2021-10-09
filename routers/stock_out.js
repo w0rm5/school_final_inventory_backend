@@ -1,10 +1,14 @@
 import express from "express";
-import { createStockOut } from "../controllers/stock_out.js";
+import { createStockOut, getAllStockOuts, getStockOut } from "../controllers/stock_out.js";
 import { checkIfAdmin } from "../middlewares/auth.js";
-import { stockOutTypes } from "../utils/enum.js";
+import { stockOutTypes, meta } from "../utils/enum.js";
 
 const checkStockOutType = (req, res, next) => {
-    if(req.body.stock_in.type != stockOutTypes.SALE){
+    let { stock_out, stock_out_items } = req.body
+    if(!stock_out || !stock_out.type || !Array.isArray(stock_out_items) || !stock_out_items.length){
+        res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: "Invalid stock out data" });
+        return
+    } else if(stock_out.type != stockOutTypes.SALE){
         checkIfAdmin(req, res, next)
     }else{
         next()
@@ -13,6 +17,8 @@ const checkStockOutType = (req, res, next) => {
 
 const router = express.Router()
 
+router.get("/:id",checkIfAdmin, getStockOut)
+router.post("/", checkIfAdmin, getAllStockOuts)
 router.post("/insert", checkStockOutType, createStockOut)
 
 export default router

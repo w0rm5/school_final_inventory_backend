@@ -19,7 +19,9 @@ const StockInSchema = mongoose.Schema({
     },
     remarks: {
         type: String,
-        default: ''
+        required: function() {
+            return this.type != stockInTypes.PURCHASE;
+        },
     },
     date: {
         type: Date,

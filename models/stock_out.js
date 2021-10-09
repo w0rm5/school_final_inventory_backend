@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { stockOutTypes } from "../utils/enum.js";
 
 const StockOutSchema = mongoose.Schema({
     type: {
@@ -7,7 +8,9 @@ const StockOutSchema = mongoose.Schema({
     },
     remarks: {
         type: String,
-        default: ''
+        required: function() {
+            return this.type != stockOutTypes.SALE;
+        },
     },
     date: {
         type: Date,

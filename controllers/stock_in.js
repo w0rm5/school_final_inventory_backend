@@ -1,10 +1,9 @@
 import { meta, stockInTypes } from "../utils/enum.js";
-import { insert, defaultCallback, find, findById, upsertById, populate } from "../utils/funcs.js";
+import { insert, defaultCallback, find, findById, populate } from "../utils/funcs.js";
 import Product from "../models/product.js";
 
 const table_name = "stock_in"
 const stock_in_item_t = "stock_in_item"
-const product_t = "product"
 
 export async function createStockIn(req, res) {
     try {
@@ -27,7 +26,7 @@ export async function createStockIn(req, res) {
                 }
                 try {
                     for (let item of docs) {
-                        let p = await Product.findById(item.product)
+                        let p = await Product.findOne({ _id: item.product, discontinued: false })
                         if(!p) {
                             res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Product not found" })
                             return
@@ -47,6 +46,8 @@ export async function createStockIn(req, res) {
                     res.status(meta.OK).json({ meta: meta.OK, doc: r })
                 } catch (errfindP) {
                     console.log("product find error: ", errfindP);
+                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errfindP.message })
+                    return
                 }
             })
         })
@@ -66,12 +67,18 @@ export async function getStockIn(req, res) {
                 res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
                 return;
             }
-            find(stock_in_item_t, { stock_in: doc._id }, "-stock_in", null, async (errFound, docsFound) => {
+            find(stock_in_item_t, { stock_in: doc._id }, "-stock_in -date", null, async (errFound, docsFound) => {
                 if (errFound) {
                     res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errFound.message });
                     return;
                 }
-                await populate(stock_in_item_t, docsFound, "product")
+                let path = {
+                    path: "product",
+                    populate: {
+                        path: "category"
+                    }
+                }
+                await populate(stock_in_item_t, docsFound, path)
                 let r = { stock_in: doc, products: docsFound }
                 res.status(meta.OK).json({ meta: meta.OK, doc: r })
             })
