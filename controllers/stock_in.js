@@ -46,8 +46,7 @@ export async function createStockIn(req, res) {
                     res.status(meta.OK).json({ meta: meta.OK, doc: r })
                 } catch (errfindP) {
                     console.log("product find error: ", errfindP);
-                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errfindP.message })
-                    return
+                    throw errfindP
                 }
             })
         })
