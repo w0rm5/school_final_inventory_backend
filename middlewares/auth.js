@@ -5,7 +5,7 @@ import User from "../models/user.js";
 export async function verifyToken(req, res, next) {
     let token = req.headers["x-access-token"]
     if(!token) {
-        res.status(meta.UNAUTHORIZED).json({ meta: meta.UNAUTHORIZED, message: "Not logged in"})
+        res.status(meta.UNAUTHORIZED).json({ meta: meta.UNAUTHORIZED, message: "User not logged in"})
         return;
     }
     try {
