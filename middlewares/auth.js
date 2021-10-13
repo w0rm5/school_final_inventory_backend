@@ -10,7 +10,7 @@ export async function verifyToken(req, res, next) {
     }
     try {
         let user = jwt.verify(token, process.env.TOKEN_KEY)
-        let userInfo = await User.findById(user._id)
+        let userInfo = await User.findById(user._id, "-password")
         if(!userInfo) {
             res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "You are not found in the list of employees"})
             return

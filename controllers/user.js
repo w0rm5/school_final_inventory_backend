@@ -151,3 +151,11 @@ export async function listUser(req, res) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
 }
+
+export async function getUserInfo(req, res) {
+    try {
+        res.status(meta.OK).json({ meta: meta.OK, info: req.userInfo })
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
