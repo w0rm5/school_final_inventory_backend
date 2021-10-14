@@ -136,7 +136,7 @@ export async function login(req, res) {
                     }
                 )
             }
-            res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "Incorrect username or password" });
+            res.status(meta.UNAUTHORIZED).json({ meta: meta.UNAUTHORIZED, message: "Incorrect username or password" });
         })
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })

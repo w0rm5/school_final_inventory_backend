@@ -63,10 +63,10 @@ export async function getProductById(req, res) {
     }
 }
 
-export async function deleteProductById(req, res) {
-    try {
-        findByIdAndDelete(table_name, req.params.id, defaultCallback(res))
-    } catch (error) {
-        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
-    }
-}
+// export async function deleteProductById(req, res) {
+//     try {
+//         findByIdAndDelete(table_name, req.params.id, defaultCallback(res))
+//     } catch (error) {
+//         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+//     }
+// }
