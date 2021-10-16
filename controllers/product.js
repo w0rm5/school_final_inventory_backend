@@ -1,12 +1,13 @@
 import { meta } from "../utils/enum.js";
-import { find, upsertById, findById, findByIdAndDelete, defaultCallback } from "../utils/funcs.js";
+import { find, findOne, upsertById, findById, defaultCallback } from "../utils/funcs.js";
+import mongoose from "mongoose";
 
 const table_name = 'product'
 
 export async function listProduct(req, res) {
     try {
-        let { filter, option } = req.body
-        find(table_name, filter, null, option, defaultCallback(res, table_name, 'category'))
+        let { filter, option, populatePath } = req.body
+        find(table_name, filter, null, option, defaultCallback(res, table_name, populatePath))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
@@ -57,7 +58,30 @@ export async function updateProductSalePrice(req, res) {
 
 export async function getProductById(req, res) {
     try {
-        findById(table_name, req.params.id, defaultCallback(res, table_name, 'category'))
+        if(!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: "Invalid Product ID" })
+            return
+        }
+        findById(table_name, req.params.id, defaultCallback(res))
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
+
+export async function getProductByName(req, res) {
+    try {
+        const callback = (err, doc) => {
+            if (err) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+                return;
+            }
+            if (!doc) {
+                res.status(meta.OK).json({ meta: meta.NOT_FOUND });
+                return;
+            }
+            res.status(meta.OK).json({ meta: meta.OK });
+        }
+        findOne(table_name, { name: req.body.name }, callback)
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
