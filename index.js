@@ -17,7 +17,7 @@ const app = express();
 const port = process.env.PORT || process.env.API_PORT;
 const dbConString = process.env.DB;
 const corsOptions = {
-    origin: 'http://localhost:8080',
+    origin: ['http://localhost:8080', 'http://localhost:8081'],
     optionsSuccessStatus: 200
 }
 
