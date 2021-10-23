@@ -68,7 +68,7 @@ export async function getProductById(req, res) {
     }
 }
 
-export async function getProductByName(req, res) {
+export async function getOneProduct(req, res) {
     try {
         const callback = (err, doc) => {
             if (err) {
@@ -81,7 +81,7 @@ export async function getProductByName(req, res) {
             }
             res.status(meta.OK).json({ meta: meta.OK });
         }
-        findOne(table_name, { name: req.body.name }, callback)
+        findOne(table_name, req.body, callback)
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
