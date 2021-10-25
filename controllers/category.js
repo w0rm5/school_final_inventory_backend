@@ -28,6 +28,25 @@ export async function getCategoryById(req, res) {
     }
 }
 
+export async function checkCategoryName(req, res) {
+    try {
+        const callback = (err, doc) => {
+            if (err) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+                return;
+            }
+            if (!doc) {
+                res.status(meta.OK).json({ meta: meta.NOT_FOUND });
+                return;
+            }
+            res.status(meta.OK).json({ meta: meta.OK });
+        }
+        findOne(table_name, { name: req.params.name }, callback)
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
+
 export async function deleteCategoryById(req, res) {
     try {
         let catId = req.params.id
@@ -37,7 +56,7 @@ export async function deleteCategoryById(req, res) {
                 return;
             }
             if (doc) {
-                res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: "Cannot delete a category that is in used." });
+                res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: "Current category is in used, cannot delete" });
                 return;
             }
             findByIdAndDelete(table_name, catId, defaultCallback(res))

@@ -2,6 +2,11 @@ import mongoose from "mongoose"
 import { stockInTypes } from "../utils/enum.js"
 
 const StockInSchema = mongoose.Schema({
+    by: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true,
+    },
     type: {
         type: Number,
         required: true
