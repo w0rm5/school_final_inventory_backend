@@ -69,5 +69,7 @@ export function deleteById(table, id, callback) {
 }
 
 export function upsertById(table, id, update, callback) {
-    return tables[table].findOneAndUpdate({ _id: id || new mongoose.Types.ObjectId() }, update, { upsert: true, new: true }, callback)
+    let objId = { _id: id || new mongoose.Types.ObjectId() }
+    let { _id, ...objectWithoutId } = update
+    return tables[table].findOneAndUpdate(objId, objectWithoutId, { upsert: true, new: true }, callback)
 }
