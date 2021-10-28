@@ -41,8 +41,8 @@ mongoose.connect(dbConString, (err) => {
     app.use("/category", verifyToken, logRequests, checkIfAdmin, category)
     app.use("/supplier", verifyToken, logRequests, checkIfAdmin, supplier)
     app.use("/product", verifyToken, logRequests, product)
-    app.use("/stock_in", verifyToken, logRequests, stock_in)
-    app.use("/stock_out", verifyToken, logRequests, stock_out)
+    app.use("/stock-in", verifyToken, logRequests, stock_in)
+    app.use("/stock-out", verifyToken, logRequests, stock_out)
     app.listen(port, () => {
         console.log(`app listening at http://localhost:${port}`);
     })
