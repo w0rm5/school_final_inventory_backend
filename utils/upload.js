@@ -1,7 +1,18 @@
 import crypto from "crypto";
 import path from "path";
 import multer from "multer";
-import GridFsStorage from "multer-gridfs-storage";
+import { GridFsStorage } from "multer-gridfs-storage";
+import mongoose from "mongoose";
+import Grid from "gridfs-stream";
+
+const conn = mongoose.createConnection(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true })
+
+var gfs
+
+conn.once("open", () => {
+  gfs = Grid(conn.db, mongoose.mongo)
+  gfs.collection("file")
+})
 
 const storage = new GridFsStorage({
   url: process.env.DB,
@@ -17,7 +28,7 @@ const storage = new GridFsStorage({
                 const filename = buf.toString("hex") + path.extname(file.originalname);
                 const fileInfo = {
                   filename: filename,
-                  bucketName: "uploads",
+                  bucketName: "file",
                 };
                 resolve(fileInfo);
               });
@@ -27,4 +38,6 @@ const storage = new GridFsStorage({
   },
 });
 
-export const upload = multer({ storage })
+const upload = multer({ storage })
+
+export { upload, gfs as uploadGfs }
