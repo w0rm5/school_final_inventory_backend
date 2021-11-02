@@ -61,3 +61,19 @@ export async function deleteFile(req, res) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
 }
+
+export async function deleteMultipleFiles(req, res) {
+    try {
+        let deleted = 0
+        for(let file of req.body) {
+            let option = { filename: file, root: "file" }
+            if(await uploadGfs.exist(option)) {
+                await uploadGfs.remove(option)
+                deleted++
+            }
+        }
+        res.status(meta.OK).json({ meta: meta.OK, message: deleted.toString() + " file(s) deleted" })
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
