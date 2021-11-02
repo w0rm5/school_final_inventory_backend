@@ -79,7 +79,7 @@ export async function getOneProduct(req, res) {
                 res.status(meta.OK).json({ meta: meta.NOT_FOUND });
                 return;
             }
-            res.status(meta.OK).json({ meta: meta.OK });
+            res.status(meta.OK).json({ meta: meta.OK, id: doc._id });
         }
         findOne(table_name, req.body, callback)
     } catch (error) {
