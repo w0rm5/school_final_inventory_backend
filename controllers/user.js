@@ -4,13 +4,12 @@ import bcrypt from "bcrypt";
 import { findOne, find, upsertById, findById, findByIdAndDelete, defaultCallback } from "../utils/funcs.js";
 
 const table_name = 'user'
-const resetPasswordCallback = (res) => (err, doc) => {
+const resetPasswordCallback = (res) => (err) => {
     if (err) {
         res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: err.message });
         return;
     }
-    let { password, ...user } = doc.toObject()
-    res.status(meta.OK).json({ meta: meta.OK, data: user });
+    res.status(meta.OK).json({ meta: meta.OK, message: "Password reset" });
 }
 
 export async function registerUser(req, res) {
@@ -120,6 +119,10 @@ export async function login(req, res) {
         findOne(table_name, { username }, async (errFound, docFound) => {
             if (errFound) {
                 res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: errFound.message });
+                return;
+            }
+            if(docFound.deactivated) {
+                res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "You have been banned from logging in." });
                 return;
             }
             if(docFound && (await bcrypt.compare(password, docFound.password))) {

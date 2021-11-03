@@ -7,8 +7,8 @@ const router = express.Router({ mergeParams: true })
 router.post("/", checkIfAdmin, listUser)
 router.post("/register", checkIfAdmin, registerUser)
 router.put("/update", checkIfAdmin, updateUser)
-router.put("/resetpassword", resetPassword )
-router.put("/forceresetpassword", checkIfAdmin, forceResetPassword )
+router.put("/reset-password", resetPassword )
+router.put("/force-reset-password", checkIfAdmin, forceResetPassword )
 router.get("/info", getUserInfo)
 
 export default router
