@@ -14,6 +14,10 @@ const resetPasswordCallback = (res) => (err) => {
 
 export async function registerUser(req, res) {
     try {
+        if(!req.userInfo.is_admin){
+            res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "You do not have permission to perform such action" })
+            return
+        }
         let user = req.body
         if(!(user.first_name && user.last_name && user.sex && user.date_of_birth && user.username && user.password)){
             res.status(meta.BAD_REQUEST).json({meta: meta.BAD_REQUEST, message: "Please input all required fields"})
@@ -158,6 +162,45 @@ export async function listUser(req, res) {
 export async function getUserInfo(req, res) {
     try {
         res.status(meta.OK).json({ meta: meta.OK, info: req.userInfo })
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
+
+export async function getUser(req, res) {
+    try {
+        const callback = (err, doc) => {
+            if (err) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+                return;
+            }
+            if (!doc) {
+                res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
+                return;
+            }
+            let { password, ...user } = doc.toObject()
+            res.status(meta.OK).json({ meta: meta.OK, data: user });
+        }
+        findById(table_name, req.params.id, callback)
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
+
+export async function checkUserExist(req, res) {
+    try {
+        const callback = (err, doc) => {
+            if (err) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+                return;
+            }
+            if (!doc) {
+                res.status(meta.OK).json({ meta: meta.NOT_FOUND });
+                return;
+            }
+            res.status(meta.OK).json({ meta: meta.OK, id: doc._id });
+        }
+        findOne(table_name, req.body, callback)
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
