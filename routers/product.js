@@ -5,8 +5,8 @@ import { checkIfAdmin } from "../middlewares/auth.js";
 const router = express.Router()
 
 router.post("/", listProduct)
-router.get("/:id", getProductById)
-router.post("/get", getOneProduct)
+router.get("/:id", checkIfAdmin, getProductById)
+router.post("/get", checkIfAdmin, getOneProduct)
 router.post("/upsert", checkIfAdmin, upsertProduct)
 router.put("/:id/update-sale-price", checkIfAdmin, updateProductSalePrice)
 // router.delete("/:id", checkIfAdmin, deleteProductById)
