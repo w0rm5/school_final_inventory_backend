@@ -7,6 +7,9 @@ const table_name = 'product'
 export async function listProduct(req, res) {
     try {
         let { filter, option, populatePath } = req.body
+        if(filter.name) {
+            filter.name = { $regex: filter.name, $options: 'i' }
+        }
         find(table_name, filter, null, option, defaultCallback(res, table_name, populatePath))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
