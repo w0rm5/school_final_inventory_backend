@@ -8,7 +8,7 @@ const stock_in_item_t = "stock_in_item"
 export async function createStockIn(req, res) {
     try {
         let { stock_in, stock_in_items } = req.body
-
+        stock_in.by = req.userInfo._id
         insert(table_name, stock_in, (err, doc) => {
             if (err) {
                 res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
@@ -42,8 +42,7 @@ export async function createStockIn(req, res) {
                         await Product.updateOne({ _id: p._id}, p)
                         item.product = p
                     }
-                    let r = { stock_in: doc, products: docs }
-                    res.status(meta.OK).json({ meta: meta.OK, doc: r })
+                    res.status(meta.OK).json({ meta: meta.OK, message: "Products stocked in" })
                 } catch (errfindP) {
                     console.log("product find error: ", errfindP);
                     throw errfindP
@@ -66,20 +65,29 @@ export async function getStockIn(req, res) {
                 res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
                 return;
             }
-            find(stock_in_item_t, { stock_in: doc._id }, "-stock_in -date", null, async (errFound, docsFound) => {
+            find(stock_in_item_t, { stock_in: doc._id }, "-stock_in -date -type", null, async (errFound, docsFound) => {
                 if (errFound) {
                     res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errFound.message });
                     return;
                 }
-                let path = {
+                let path = [
+                    {
+                        path: "by",
+                        select: "first_name last_name",
+                    },
+                    "supplier"
+                ];
+                let itemsPath = {
                     path: "product",
+                    select: "name images barcode category",
                     populate: {
                         path: "category"
                     }
                 }
-                await populate(stock_in_item_t, docsFound, path)
+                await populate(table_name, doc, path)
+                await populate(stock_in_item_t, docsFound, itemsPath)
                 let r = { stock_in: doc, products: docsFound }
-                res.status(meta.OK).json({ meta: meta.OK, doc: r })
+                res.status(meta.OK).json({ meta: meta.OK, data: r })
             })
         })
     } catch (error) {
@@ -90,7 +98,14 @@ export async function getStockIn(req, res) {
 export async function getAllStockIns(req, res) {
     try {
         let { filter, option } = req.body
-        find(table_name, filter, null, option, defaultCallback(res, table_name, 'supplier'))
+        let path = [
+            {
+                path: "by",
+                select: "first_name last_name",
+            },
+            "supplier"
+        ];
+        find(table_name, filter, null, option, defaultCallback(res, table_name, path))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }

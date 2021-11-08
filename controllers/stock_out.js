@@ -8,6 +8,7 @@ const stock_out_item_t = "stock_out_item"
 export async function createStockOut(req, res) {
     try {
         let { stock_out, stock_out_items } = req.body
+        stock_out.by = req.userInfo._id
         let products = []
         for (let item of stock_out_items) {
             let p = await Product.findOne({ _id: item.product, discontinued: false })
