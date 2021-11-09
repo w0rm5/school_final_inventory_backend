@@ -1,9 +1,37 @@
 import { meta, stockOutTypes } from "../utils/enum.js";
-import { insert, defaultCallback, find, findById } from "../utils/funcs.js";
+import { insert, defaultCallback, find, findById, getCode } from "../utils/funcs.js";
 import Product from "../models/product.js";
+import AutoNumber from "../models/auto_number.js";
 
 const table_name = "stock_out"
 const stock_out_item_t = "stock_out_item"
+
+function insertStockOut(stock_out, stock_out_items, products, res) {
+    insert(table_name, stock_out, (err, doc) => {
+        if (err) {
+            throw err;
+        } else {
+            for (let item of stock_out_items) {
+                item.stock_out = doc._id
+                item.type = doc.type
+                item.date = doc.date
+            }
+            insert(stock_out_item_t, stock_out_items, async (errItem, docs) => {
+                if (errItem) {
+                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errItem.message });
+                    return;
+                }
+                for (let item of docs) {
+                    let p = products.find(e => e._id.toString() == item.product)
+                    await Product.updateOne({ _id: p._id}, p)
+                    item.product = p
+                }
+                let r = { stock_out: doc, product: docs }
+                res.status(meta.OK).json({ meta: meta.OK, doc: r })
+            })
+        }
+    })
+}
 
 export async function createStockOut(req, res) {
     try {
@@ -60,31 +88,24 @@ export async function createStockOut(req, res) {
             p.current_quantity -= item.quantity
             products.push(p)
         }
+        if(stock_out.type == stockOutTypes.SALE) {
+            AutoNumber.findOneAndUpdate(
+                { prefix: "S" },
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true },
+                (err, result) => {
+                    if (err) {
+                        throw err;
+                    } else {
+                        stock_out.transaction_no = getCode(result.prefix, result.seq, 6);
+                        insertStockOut(stock_out, stock_out_items, products, res)
+                    }
+                }
+            );
+        } else {
+            insertStockOut(stock_out, stock_out_items, products, res)
+        }
         
-        insert(table_name, stock_out, (err, doc) => {
-            if (err) {
-                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
-                return;
-            }
-            for (let item of stock_out_items) {
-                item.stock_out = doc._id
-                item.type = doc.type
-                item.date = doc.date
-            }
-            insert(stock_out_item_t, stock_out_items, async (errItem, docs) => {
-                if (errItem) {
-                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errItem.message });
-                    return;
-                }
-                for (let item of docs) {
-                    let p = products.find(e => e._id.toString() == item.product)
-                    await Product.updateOne({ _id: p._id}, p)
-                    item.product = p
-                }
-                let r = { stock_out: doc, product: docs }
-                res.status(meta.OK).json({ meta: meta.OK, doc: r })
-            })
-        })
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }

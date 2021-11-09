@@ -11,6 +11,13 @@ const StockOutSchema = mongoose.Schema({
         type: Number,
         required: true
     },
+    transaction_no: {
+        type: String,
+        unique: true,
+        required: function () {
+          return this.type == stockOutTypes.SALE;
+        },
+    },
     remarks: {
         type: String,
         required: function() {

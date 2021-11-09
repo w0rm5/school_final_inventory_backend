@@ -4,7 +4,7 @@ import { stockInTypes } from "../utils/enum.js"
 const StockInSchema = mongoose.Schema({
     by: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'user',
+        ref: "user",
         required: true,
     },
     type: {
@@ -13,7 +13,14 @@ const StockInSchema = mongoose.Schema({
     },
     supplier: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'supplier',
+        ref: "supplier",
+        required: function() {
+            return this.type == stockInTypes.PURCHASE;
+        }
+    },
+    transaction_no: {
+        type: String,
+        unique: true,
         required: function() {
             return this.type == stockInTypes.PURCHASE;
         },
@@ -37,4 +44,4 @@ const StockInSchema = mongoose.Schema({
     versionKey: false
 })
 
-export default mongoose.model("stock_in", StockInSchema)
+export default mongoose.model("stock_in", StockInSchema);

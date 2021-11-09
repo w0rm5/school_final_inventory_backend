@@ -73,3 +73,11 @@ export function upsertById(table, id, update, callback) {
     let { _id, ...objectWithoutId } = update
     return tables[table].findOneAndUpdate(objId, objectWithoutId, { upsert: true, new: true }, callback)
 }
+
+export function getCode(prefix, number, length) {
+    let code = number.toString()
+    while (code.length < length) {
+        code = "0" + code
+    }
+    return prefix + code
+}
