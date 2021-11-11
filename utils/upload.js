@@ -18,8 +18,8 @@ const storage = new GridFsStorage({
   url: process.env.DB,
   file: (req, file) => {
     return new Promise((resolve, reject) => {
-        if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png') {
-            return reject("Image must be in JPG or PNG format.");
+        if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/png' && file.mimetype !== 'application/pdf') {
+            return reject("File must be in JPG or PNG format (for images) or PDF format (for documents).");
           } else {
             crypto.randomBytes(16, (err, buf) => {
                 if (err) {

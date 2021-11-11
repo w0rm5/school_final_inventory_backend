@@ -1,7 +1,7 @@
 import express from "express";
 import { getStockIn, createStockIn, getAllStockIns } from "../controllers/stock_in.js";
 import { checkIfAdmin } from "../middlewares/auth.js";
-import { stockInTypes } from "../utils/enum.js";
+import { stockInTypes, meta } from "../utils/enum.js";
 
 const checkStockInType = (req, res, next) => {
     let { stock_in, stock_in_items } = req.body

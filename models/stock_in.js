@@ -39,6 +39,10 @@ const StockInSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    total_amount: {
+        type: Number,
+        required: true
+    }
 },
 {
     versionKey: false

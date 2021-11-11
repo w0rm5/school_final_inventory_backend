@@ -1,5 +1,5 @@
 import { meta, stockOutTypes } from "../utils/enum.js";
-import { insert, defaultCallback, find, findById, getCode } from "../utils/funcs.js";
+import { insert, defaultCallback, find, findById, getCode, populate } from "../utils/funcs.js";
 import Product from "../models/product.js";
 import AutoNumber from "../models/auto_number.js";
 
@@ -26,8 +26,7 @@ function insertStockOut(stock_out, stock_out_items, products, res) {
                     await Product.updateOne({ _id: p._id}, p)
                     item.product = p
                 }
-                let r = { stock_out: doc, product: docs }
-                res.status(meta.OK).json({ meta: meta.OK, doc: r })
+                res.status(meta.OK).json({ meta: meta.OK, message: doc.type === stockOutTypes.SALE ? "Sale created" : "Purchase stocked out" });
             })
         }
     })
@@ -78,12 +77,12 @@ export async function createStockOut(req, res) {
                 }
             }
             if (stock_out.type == stockOutTypes.SALE) {
-                let totalCost = 0, cLength = cost_histories.length
-                //Array.reduce works too, but it's slower than traditional For Loop
+                let totalCost = 0, totalQuantity = 0, cLength = cost_histories.length
                 for(let i = 0; i < cLength; i++) {
                     totalCost += cost_histories[i].cost * cost_histories[i].remaining_qty
+                    totalQuantity += cost_histories[i].remaining_qty
                 }
-                item.cost = Math.round(((totalCost / item.quantity) + Number.EPSILON) * 100 ) / 100
+                item.cost = Math.round(((totalCost / totalQuantity) + Number.EPSILON) * 100 ) / 100
             }
             p.current_quantity -= item.quantity
             products.push(p)
@@ -122,14 +121,29 @@ export async function getStockOut(req, res) {
                 res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
                 return;
             }
-            find(stock_out_item_t, { stock_out: doc._id }, "-stock_out", null, async (errFound, docsFound) => {
+            find(stock_out_item_t, { stock_out: doc._id }, "-stock_out -date -type", null, async (errFound, docsFound) => {
                 if (errFound) {
                     res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errFound.message });
                     return;
                 }
-                await populate(stock_out_item_t, docsFound, "product")
+                let path = [
+                    {
+                        path: "by",
+                        select: "first_name last_name",
+                    },
+                    "supplier"
+                ];
+                let itemsPath = {
+                    path: "product",
+                    select: "name images barcode category",
+                    populate: {
+                        path: "category"
+                    }
+                }
+                await populate(table_name, doc, path)
+                await populate(stock_out_item_t, docsFound, itemsPath)
                 let r = { stock_out: doc, products: docsFound }
-                res.status(meta.OK).json({ meta: meta.OK, doc: r })
+                res.status(meta.OK).json({ meta: meta.OK, data: r })
             })
         })
     } catch (error) {
@@ -140,7 +154,14 @@ export async function getStockOut(req, res) {
 export async function getAllStockOuts(req, res) {
     try {
         let { filter, option } = req.body
-        find(table_name, filter, null, option, defaultCallback(res))
+        let path = [
+            {
+                path: "by",
+                select: "first_name last_name",
+            },
+            "supplier"
+        ];
+        find(table_name, filter, null, option, defaultCallback(res, table_name, path))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
