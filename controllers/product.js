@@ -10,6 +10,9 @@ export async function listProduct(req, res) {
         if(filter.name) {
             filter.name = { $regex: filter.name, $options: 'i' }
         }
+        if(filter.current_quantity) {
+            filter.current_quantity = { $gt: 0 }
+        }
         find(table_name, filter, null, option, defaultCallback(res, table_name, populatePath))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })

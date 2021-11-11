@@ -1,5 +1,4 @@
 import mongoose from "mongoose"
-import { stockInTypes } from "../utils/enum.js"
 
 const StockInItemSchema = mongoose.Schema({
     type: {
@@ -23,9 +22,7 @@ const StockInItemSchema = mongoose.Schema({
     cost: { // per unit
         type: Number,
         min: 0,
-        required: function() {
-            return this.type == stockInTypes.PURCHASE
-        },
+        required: true
     },
     quantity: {
         type: Number,

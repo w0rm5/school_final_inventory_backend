@@ -27,13 +27,11 @@ function insertStockIn(stock_in, stock_in_items, res) {
                         res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Product not found" })
                         return
                     }
-                    if (item.type == stockInTypes.PURCHASE) {
-                        p.cost_history.push({
-                            stock_in_item: item._id,
-                            cost: item.cost,
-                            remaining_qty: item.quantity
-                        })
-                    }
+                    p.cost_history.push({
+                        stock_in_item: item._id,
+                        cost: item.cost,
+                        remaining_qty: item.quantity
+                    })
                     p.current_quantity += item.quantity
                     await Product.updateOne({ _id: p._id}, p)
                     item.product = p

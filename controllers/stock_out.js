@@ -54,9 +54,7 @@ export async function createStockOut(req, res) {
             if(p.cost_history[0].remaining_qty < item.quantity) {
                 let qty = 0
                 while (qty < item.quantity) {
-                    if (stock_out.type == stockOutTypes.SALE) {
-                        cost_histories.push(Object.assign({}, p.cost_history[0]))
-                    }
+                    cost_histories.push(Object.assign({}, p.cost_history[0]))
                     qty += p.cost_history[0].remaining_qty
                     if(qty <= item.quantity) {
                         p.cost_history.shift()
@@ -68,22 +66,18 @@ export async function createStockOut(req, res) {
                     }
                 }
             } else {
-                if (stock_out.type == stockOutTypes.SALE) {
-                    cost_histories.push(Object.assign({}, p.cost_history[0]))
-                }
+                cost_histories.push(Object.assign({}, p.cost_history[0]))
                 p.cost_history[0].remaining_qty -= item.quantity
                 if(p.cost_history[0].remaining_qty === 0) {
                     p.cost_history.shift()
                 }
             }
-            if (stock_out.type == stockOutTypes.SALE) {
-                let totalCost = 0, totalQuantity = 0, cLength = cost_histories.length
-                for(let i = 0; i < cLength; i++) {
-                    totalCost += cost_histories[i].cost * cost_histories[i].remaining_qty
-                    totalQuantity += cost_histories[i].remaining_qty
-                }
-                item.cost = Math.round(((totalCost / totalQuantity) + Number.EPSILON) * 100 ) / 100
+            let totalCost = 0, totalQuantity = 0, cLength = cost_histories.length
+            for(let i = 0; i < cLength; i++) {
+                totalCost += cost_histories[i].cost * cost_histories[i].remaining_qty
+                totalQuantity += cost_histories[i].remaining_qty
             }
+            item.cost = Math.round(((totalCost / totalQuantity) + Number.EPSILON) * 100 ) / 100
             p.current_quantity -= item.quantity
             products.push(p)
         }
@@ -104,7 +98,6 @@ export async function createStockOut(req, res) {
         } else {
             insertStockOut(stock_out, stock_out_items, products, res)
         }
-        
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
