@@ -1,5 +1,5 @@
 import { meta, stockOutTypes } from "../utils/enum.js";
-import { insert, defaultCallback, find, findById, getCode, populate } from "../utils/funcs.js";
+import { insert, defaultCallback, find, findById, findOne, getCode, populate } from "../utils/funcs.js";
 import Product from "../models/product.js";
 import AutoNumber from "../models/auto_number.js";
 
@@ -29,6 +29,41 @@ function insertStockOut(stock_out, stock_out_items, products, res) {
                 res.status(meta.OK).json({ meta: meta.OK, message: doc.type === stockOutTypes.SALE ? "Sale created" : "Purchase stocked out" });
             })
         }
+    })
+}
+
+const getStockOutCallback = res => (err, doc) => {
+    if (err) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+        return;
+    }
+    if (!doc) {
+        res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
+        return;
+    }
+    find(stock_out_item_t, { stock_out: doc._id }, "-stock_out -date -type", null, async (errFound, docsFound) => {
+        if (errFound) {
+            res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errFound.message });
+            return;
+        }
+        let path = [
+            {
+                path: "by",
+                select: "first_name last_name",
+            },
+            "supplier"
+        ];
+        let itemsPath = {
+            path: "product",
+            select: "name images barcode category",
+            populate: {
+                path: "category"
+            }
+        }
+        await populate(table_name, doc, path)
+        await populate(stock_out_item_t, docsFound, itemsPath)
+        let r = { stock_out: doc, products: docsFound }
+        res.status(meta.OK).json({ meta: meta.OK, data: r })
     })
 }
 
@@ -103,42 +138,17 @@ export async function createStockOut(req, res) {
     }
 }
 
-export async function getStockOut(req, res) {
+export async function getStockOutById(req, res) {
     try {
-        findById(table_name, req.params.id, (err, doc) => {
-            if (err) {
-                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
-                return;
-            }
-            if (!doc) {
-                res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Not found" });
-                return;
-            }
-            find(stock_out_item_t, { stock_out: doc._id }, "-stock_out -date -type", null, async (errFound, docsFound) => {
-                if (errFound) {
-                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errFound.message });
-                    return;
-                }
-                let path = [
-                    {
-                        path: "by",
-                        select: "first_name last_name",
-                    },
-                    "supplier"
-                ];
-                let itemsPath = {
-                    path: "product",
-                    select: "name images barcode category",
-                    populate: {
-                        path: "category"
-                    }
-                }
-                await populate(table_name, doc, path)
-                await populate(stock_out_item_t, docsFound, itemsPath)
-                let r = { stock_out: doc, products: docsFound }
-                res.status(meta.OK).json({ meta: meta.OK, data: r })
-            })
-        })
+        findById(table_name, req.params.id, getStockOutCallback(res))
+    } catch (error) {
+        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
+    }
+}
+
+export async function getStockOutByTransNum(req, res) {
+    try {
+        findOne(table_name, { transaction_no : req.params.trans_no }, getStockOutCallback(res))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
@@ -151,9 +161,14 @@ export async function getAllStockOuts(req, res) {
             {
                 path: "by",
                 select: "first_name last_name",
-            },
-            "supplier"
+            }
         ];
+        if(filter.date) {
+            filter.date = {
+                $gte: new Date(filter.date[0]),
+                $lt: new Date(filter.date[1])
+            }
+        }
         find(table_name, filter, null, option, defaultCallback(res, table_name, path))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })

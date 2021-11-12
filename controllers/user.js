@@ -125,23 +125,25 @@ export async function login(req, res) {
                 res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: errFound.message });
                 return;
             }
-            if(docFound.deactivated) {
-                res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "You have been banned from logging in." });
-                return;
-            }
-            if(docFound && (await bcrypt.compare(password, docFound.password))) {
-                return jwt.sign(
-                    { _id: docFound._id }, 
-                    process.env.TOKEN_KEY, 
-                    { expiresIn: '7d' },
-                    (err, encoded) => {
-                        if(err) {
-                            res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
-                            return
+            if(docFound) {
+                if(docFound.deactivated) {
+                    res.status(meta.FORBIDDEN).json({ meta: meta.FORBIDDEN, message: "You have been banned from logging in." });
+                    return;
+                }
+                if(await bcrypt.compare(password, docFound.password)) {
+                    return jwt.sign(
+                        { _id: docFound._id }, 
+                        process.env.TOKEN_KEY, 
+                        { expiresIn: '7d' },
+                        (err, encoded) => {
+                            if(err) {
+                                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+                                return
+                            }
+                            return res.status(meta.OK).json({ meta: meta.OK, token: encoded })
                         }
-                        return res.status(meta.OK).json({ meta: meta.OK, token: encoded })
-                    }
-                )
+                    )
+                }
             }
             res.status(meta.UNAUTHORIZED).json({ meta: meta.UNAUTHORIZED, message: "Incorrect username or password" });
         })

@@ -1,5 +1,5 @@
 import express from "express";
-import { createStockOut, getAllStockOuts, getStockOut } from "../controllers/stock_out.js";
+import { createStockOut, getAllStockOuts, getStockOutById, getStockOutByTransNum } from "../controllers/stock_out.js";
 import { checkIfAdmin } from "../middlewares/auth.js";
 import { stockOutTypes, meta } from "../utils/enum.js";
 
@@ -17,7 +17,8 @@ const checkStockOutType = (req, res, next) => {
 
 const router = express.Router()
 
-router.get("/:id",checkIfAdmin, getStockOut)
+router.get("/:id", checkIfAdmin, getStockOutById)
+router.get("/trans-no/:trans_no", getStockOutByTransNum)
 router.post("/", checkIfAdmin, getAllStockOuts)
 router.post("/insert", checkStockOutType, createStockOut)
 

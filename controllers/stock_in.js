@@ -125,6 +125,12 @@ export async function getAllStockIns(req, res) {
             },
             "supplier"
         ];
+        if(filter.date) {
+            filter.date = {
+                $gte: new Date(filter.date[0]),
+                $lt: new Date(filter.date[1])
+            }
+        }
         find(table_name, filter, null, option, defaultCallback(res, table_name, path))
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })

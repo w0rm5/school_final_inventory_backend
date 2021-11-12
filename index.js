@@ -33,10 +33,6 @@ mongoose.connect(dbConString, options, (err) => {
     app.use(cors(corsOptions))
     app.use(express.json());
 
-    // app.get('/', verifyToken, checkIfAdmin, (req, res) => { //testing
-    //     res.status(200).json({ message: 'Hello world' })
-    // })
-
     app.post("/login", logRequests, login)
     app.use("/user", verifyToken, logRequests, user)
     app.use("/category", verifyToken, logRequests, checkIfAdmin, category)
