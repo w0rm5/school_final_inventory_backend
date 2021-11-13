@@ -21,8 +21,16 @@ const StockInSchema = mongoose.Schema({
     transaction_no: {
         type: String,
         unique: true,
+        sparse: true,
         required: function() {
             return this.type == stockInTypes.PURCHASE;
+        },
+    },
+    sale_return: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "stock_out",
+        required: function() {
+            return this.type == stockInTypes.RETURN;
         },
     },
     attachments: {

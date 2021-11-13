@@ -14,6 +14,7 @@ const StockOutSchema = mongoose.Schema({
     transaction_no: {
         type: String,
         unique: true,
+        sparse: true,
         required: function () {
           return this.type == stockOutTypes.SALE;
         },

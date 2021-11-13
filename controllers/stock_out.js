@@ -5,6 +5,8 @@ import AutoNumber from "../models/auto_number.js";
 
 const table_name = "stock_out"
 const stock_out_item_t = "stock_out_item"
+const stock_in_item_t = "stock_in_item"
+const stock_in_t = "stock_in"
 
 function insertStockOut(stock_out, stock_out_items, products, res) {
     insert(table_name, stock_out, (err, doc) => {
@@ -62,8 +64,15 @@ const getStockOutCallback = res => (err, doc) => {
         }
         await populate(table_name, doc, path)
         await populate(stock_out_item_t, docsFound, itemsPath)
-        let r = { stock_out: doc, products: docsFound }
-        res.status(meta.OK).json({ meta: meta.OK, data: r })
+
+        find(stock_in_item_t, { sale_return: doc._id }, "-stock_in -date -type", null, (errStockIn, docsStockIn) => {
+            if (errStockIn) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errStockIn.message });
+                return;
+            }
+            let r = { stock_out: doc, products: docsFound, return: docsStockIn }
+            res.status(meta.OK).json({ meta: meta.OK, data: r })
+        })
     })
 }
 

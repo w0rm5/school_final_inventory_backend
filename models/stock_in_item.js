@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import { stockInTypes } from "../utils/enum.js"
 
 const StockInItemSchema = mongoose.Schema({
     type: {
@@ -13,6 +14,13 @@ const StockInItemSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'stock_in',
         required: true
+    },
+    sale_return: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "stock_out",
+        required: function() {
+            return this.type == stockInTypes.RETURN;
+        },
     },
     product: {
         type: mongoose.Schema.Types.ObjectId,

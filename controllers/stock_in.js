@@ -9,22 +9,27 @@ const stock_in_item_t = "stock_in_item"
 function insertStockIn(stock_in, stock_in_items, res) {
     insert(table_name, stock_in, (err, doc) => {
         if (err) {
-            throw err;
+            res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+            return;
         }
         for (let item of stock_in_items) {
             item.stock_in = doc._id
             item.type = doc.type
             item.date = doc.date
+            if(doc.type == stockInTypes.RETURN) {
+                item.sale_return = doc.sale_return
+            }
         }
         insert(stock_in_item_t, stock_in_items, async (errItem, docs) => {
             if (errItem) {
-                throw errItem;
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errItem.message })
+                return;
             }
             try {
                 for (let item of docs) {
                     let p = await Product.findOne({ _id: item.product, discontinued: false })
                     if(!p) {
-                        res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "Product not found" })
+                        res.status(meta.NOT_FOUND).json({ meta: meta.NOT_FOUND, message: "One of the product(s) is not found" })
                         return
                     }
                     p.cost_history.push({
@@ -34,12 +39,12 @@ function insertStockIn(stock_in, stock_in_items, res) {
                     })
                     p.current_quantity += item.quantity
                     await Product.updateOne({ _id: p._id}, p)
-                    item.product = p
                 }
-                res.status(meta.OK).json({ meta: meta.OK, message: "Products stocked in" })
+                res.status(meta.OK).json({ meta: meta.OK, message: doc.type == stockInTypes.RETURN ? "Product(s) returned" : "Product(s) stocked in" })
             } catch (errfindP) {
                 console.log("product find error: ", errfindP);
-                throw errfindP
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errfindP.message })
+                return;
             }
         })
     })
@@ -59,7 +64,8 @@ export async function createStockIn(req, res) {
               },
               function (err, result) {
                 if (err) {
-                  throw err;
+                  res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+                  return;
                 } else {
                   stock_in.transaction_no = getCode(result.prefix, result.seq, 6);
                   insertStockIn(stock_in, stock_in_items, res)
@@ -95,7 +101,7 @@ export async function getStockIn(req, res) {
                         path: "by",
                         select: "first_name last_name",
                     },
-                    "supplier"
+                    "supplier", "sale_return"
                 ];
                 let itemsPath = {
                     path: "product",
