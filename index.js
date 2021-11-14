@@ -13,6 +13,7 @@ import user from "./routers/user.js";
 import stock_in from "./routers/stock_in.js";
 import stock_out from "./routers/stock_out.js";
 import upload from "./routers/upload.js";
+import report from "./routers/report.js";
 
 const app = express();
 const port = process.env.PORT || process.env.API_PORT;
@@ -41,6 +42,7 @@ mongoose.connect(dbConString, options, (err) => {
     app.use("/stock-in", verifyToken, logRequests, stock_in)
     app.use("/stock-out", verifyToken, logRequests, stock_out)
     app.use("/file", logRequests, upload)
+    app.use("/report", verifyToken, logRequests, checkIfAdmin, report)
     app.listen(port, () => {
         console.log(`app listening at http://localhost:${port}`);
     })
