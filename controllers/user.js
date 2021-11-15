@@ -1,7 +1,7 @@
 import { meta } from "../utils/enum.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
-import { findOne, find, upsertById, findById, defaultCallback } from "../utils/funcs.js";
+import { findOne, find, upsertById, findById, defaultCallback, countDocs } from "../utils/funcs.js";
 
 const table_name = 'user'
 const resetPasswordCallback = (res) => (err) => {
@@ -155,7 +155,19 @@ export async function login(req, res) {
 export async function listUser(req, res) {
     try {
         let { filter, option } = req.body
-        find(table_name, filter, '-password', option, defaultCallback(res))
+        countDocs(table_name, filter, (errCount, count) => {
+            if(errCount) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errCount.message })
+                return
+            }
+            find(table_name, filter, '-password', option, (err, docs) => {
+                if(err) {
+                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+                    return
+                }
+                res.status(meta.OK).json({ meta: meta.OK, data: docs, count })
+            })
+        })
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }

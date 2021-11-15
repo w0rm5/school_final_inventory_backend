@@ -81,3 +81,7 @@ export function getCode(prefix, number, length) {
     }
     return prefix + code
 }
+
+export function countDocs(table, filter, callback) {
+    return tables[table].countDocuments(filter, callback)
+}
