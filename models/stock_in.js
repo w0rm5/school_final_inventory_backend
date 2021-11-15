@@ -50,7 +50,11 @@ const StockInSchema = mongoose.Schema({
     total_amount: {
         type: Number,
         required: true
-    }
+    },
+    total_qty: {
+        type: Number,
+        required: true
+    },
 },
 {
     versionKey: false

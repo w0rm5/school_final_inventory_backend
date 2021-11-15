@@ -1,7 +1,7 @@
 import { meta } from "../utils/enum.js";
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt";
-import { findOne, find, upsertById, findById, findByIdAndDelete, defaultCallback } from "../utils/funcs.js";
+import { findOne, find, upsertById, findById, defaultCallback } from "../utils/funcs.js";
 
 const table_name = 'user'
 const resetPasswordCallback = (res) => (err) => {
@@ -9,7 +9,7 @@ const resetPasswordCallback = (res) => (err) => {
         res.status(meta.BAD_REQUEST).json({ meta: meta.BAD_REQUEST, message: err.message });
         return;
     }
-    res.status(meta.OK).json({ meta: meta.OK, message: "Password reset" });
+    res.status(meta.OK).json({ meta: meta.OK });
 }
 
 export async function registerUser(req, res) {
