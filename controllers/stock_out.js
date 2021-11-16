@@ -1,5 +1,5 @@
 import { meta, stockOutTypes } from "../utils/enum.js";
-import { insert, defaultCallback, find, findById, findOne, getCode, populate } from "../utils/funcs.js";
+import { insert, defaultCallback, find, findById, findOne, getCode, populate, countDocs } from "../utils/funcs.js";
 import Product from "../models/product.js";
 import AutoNumber from "../models/auto_number.js";
 
@@ -178,7 +178,20 @@ export async function getAllStockOuts(req, res) {
                 $lt: new Date(filter.date[1])
             }
         }
-        find(table_name, filter, null, option, defaultCallback(res, table_name, path))
+        countDocs(table_name, filter, (errCount, count) => {
+            if(errCount) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errCount.message })
+                return
+            }
+            find(table_name, filter, null, option, async (err, docs) => {
+                if(err) {
+                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+                    return
+                }
+                await populate(table_name, docs, path)
+                res.status(meta.OK).json({ meta: meta.OK, data: docs, count })
+            })
+        })
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }

@@ -1,5 +1,5 @@
 import { meta } from "../utils/enum.js";
-import { find, findOne, upsertById, findById, defaultCallback } from "../utils/funcs.js";
+import { find, findOne, upsertById, findById, defaultCallback, populate, countDocs } from "../utils/funcs.js";
 import mongoose from "mongoose";
 
 const table_name = 'product'
@@ -13,7 +13,20 @@ export async function listProduct(req, res) {
         if(filter.current_quantity) {
             filter.current_quantity = { $gt: 0 }
         }
-        find(table_name, filter, null, option, defaultCallback(res, table_name, populatePath))
+        countDocs(table_name, filter, (errCount, count) => {
+            if(errCount) {
+                res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: errCount.message })
+                return
+            }
+            find(table_name, filter, null, option, async (err, docs) => {
+                if(err) {
+                    res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
+                    return
+                }
+                await populate(table_name, docs, populatePath)
+                res.status(meta.OK).json({ meta: meta.OK, data: docs, count })
+            })
+        })
     } catch (error) {
         res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: error.message })
     }
