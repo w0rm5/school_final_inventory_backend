@@ -23,7 +23,9 @@ export async function listProduct(req, res) {
                     res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message })
                     return
                 }
-                await populate(table_name, docs, populatePath)
+                if(populatePath) {
+                    await populate(table_name, docs, populatePath)
+                }
                 res.status(meta.OK).json({ meta: meta.OK, data: docs, count })
             })
         })
