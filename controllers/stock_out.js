@@ -6,12 +6,12 @@ import AutoNumber from "../models/auto_number.js";
 const table_name = "stock_out"
 const stock_out_item_t = "stock_out_item"
 const stock_in_item_t = "stock_in_item"
-const stock_in_t = "stock_in"
 
 function insertStockOut(stock_out, stock_out_items, products, res) {
     insert(table_name, stock_out, (err, doc) => {
         if (err) {
-            throw err;
+            res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+            return;
         } else {
             for (let item of stock_out_items) {
                 item.stock_out = doc._id
@@ -132,7 +132,8 @@ export async function createStockOut(req, res) {
                 { new: true, upsert: true },
                 (err, result) => {
                     if (err) {
-                        throw err;
+                        res.status(meta.INTERNAL_ERROR).json({ meta: meta.INTERNAL_ERROR, message: err.message });
+                        return;
                     } else {
                         stock_out.transaction_no = getCode(result.prefix, result.seq, 6);
                         insertStockOut(stock_out, stock_out_items, products, res)
